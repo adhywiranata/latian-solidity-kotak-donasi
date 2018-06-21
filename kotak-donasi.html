@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Kotak Donasi</title>
+    <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Slabo 27px', serif;
+      }
+      .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      h1, h2 {
+        text-align: center;
+      }
+      #account-address {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>KOTAK DONASI</h1>
+      <h2>My Account: <span id="account-address"></span></h2>
+    </div>
+    <script src="https://cdn.rawgit.com/ethereum/web3.js/1.0/dist/web3.min.js"></script>
+    <script>
+      // seleksi dom #account-address dan isi sementara nilainya dengan teks node "loading..."
+      const addressPlaceholder = document.querySelector('#account-address');
+      addressPlaceholder.innerHTML = 'loading...';
+
+      window.addEventListener('load', () => {
+        // menjadikan MetaMask yang sudah ter-logged in sebagai provider kita
+        // MetaMask sebagai browser extension otomatis membuat sebuah object di window
+        // kita tinggal akses dengan window.web3.currentProvider
+        web3 = new Web3(window.web3.currentProvider);
+        // mendapatkan semua account yang ada di MetaMask
+        web3.eth.getAccounts().then(accounts => {
+          // walaupun di MetaMask kita punya mungkin lebih dari satu account,
+          // MetaMask hanya akan memberikan array yang berisi satu account,
+          // yaitu account yang sedang aktif kita gunakan
+          addressPlaceholder.innerHTML = accounts[0];
+        });
+      });
+    </script>
+  </body>
+</html>
