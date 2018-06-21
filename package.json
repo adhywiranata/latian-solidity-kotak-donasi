@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^6.0.0",
     "scrypt": "^6.0.3",
     "solc": "^0.4.24",
     "truffle-hdwallet-provider": "0.0.5",
