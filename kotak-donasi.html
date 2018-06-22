@@ -20,6 +20,20 @@
       .info-value {
         color: orange;
       }
+      input {
+        padding: 12.5px;
+        width: 200px;
+        font-size: 24px;
+        border: 1px solid teal;
+        outline: none;
+      }
+      .btn {
+        background-color: teal;
+        color: white;
+        font-size: 1rem;
+        border: 0;
+        padding: 10px 20px;
+      }
     </style>
   </head>
   <body>
@@ -27,9 +41,15 @@
       <h1>KOTAK DONASI</h1>
       <h2>My Account: <span id="account-address" class="info-value"></span></h2>
       <h2>Total Donated Amount: <span id="donation-balance" class="info-value"></span></h2>
+      <div id="donate-form" style="display: none;">
+        <input id="donate-value" type="text" />
+        <button id="donate-btn" class="btn">DONATE</button>
+      </div>
     </div>
     <script src="https://cdn.rawgit.com/ethereum/web3.js/1.0/dist/web3.min.js"></script>
     <script>
+      // membuat variable global untuk menampung account address
+      let accountAddress = null;
       // seleksi dom #account-address dan isi sementara nilainya dengan teks node "loading..."
       const addressPlaceholder = document.querySelector('#account-address');
       addressPlaceholder.innerHTML = 'loading...';
@@ -45,6 +65,9 @@
           // MetaMask hanya akan memberikan array yang berisi satu account,
           // yaitu account yang sedang aktif kita gunakan
           addressPlaceholder.innerHTML = accounts[0];
+          // memunculkan form donasi setelah account address didapatkan
+          accountAddress = accounts[0];
+          document.querySelector('#donate-form').style.display = 'flex';
         });
         
         // menghubungkan front-end app ke contract yang telah di deploy
@@ -60,7 +83,24 @@
         balancePlaceholder.innerHTML = 'loading...';
         // mencoba memanggil salah satu method yang ada di contract
         donationBoxContract.methods.getDonationBalance().call().then(res => {
-          balancePlaceholder.innerHTML = res + ' ETH';
+          // format satuan dari wei ke ether
+          balancePlaceholder.innerHTML = web3.utils.fromWei(res, 'ether') + ' ETH';
+        });
+        
+        // seleksi dom input dan button
+        const donateValueInput = document.querySelector('#donate-value');
+        const donateBtn = document.querySelector('#donate-btn');
+        
+        // menambahkan listener click pada button donate
+        donateBtn.addEventListener('click', () => {
+          // mengambil value jumlah ether yang akan didonasikan dalam string
+          const donateValue = donateValueInput.value;
+          // menjalankan method donate dengan mengirimkan sejumlah ether
+          // kita harus format satuan dari ether ke wei
+          donationBoxContract.methods.donate().send({
+            value: web3.utils.toWei(donateValue, 'ether'),
+            from: accountAddress,
+          });
         });
       });
     </script>
