@@ -17,7 +17,7 @@
       h1, h2 {
         text-align: center;
       }
-      #account-address {
+      .info-value {
         color: orange;
       }
     </style>
@@ -25,7 +25,8 @@
   <body>
     <div class="container">
       <h1>KOTAK DONASI</h1>
-      <h2>My Account: <span id="account-address"></span></h2>
+      <h2>My Account: <span id="account-address" class="info-value"></span></h2>
+      <h2>Total Donated Amount: <span id="donation-balance" class="info-value"></span></h2>
     </div>
     <script src="https://cdn.rawgit.com/ethereum/web3.js/1.0/dist/web3.min.js"></script>
     <script>
@@ -44,6 +45,22 @@
           // MetaMask hanya akan memberikan array yang berisi satu account,
           // yaitu account yang sedang aktif kita gunakan
           addressPlaceholder.innerHTML = accounts[0];
+        });
+        
+        // menghubungkan front-end app ke contract yang telah di deploy
+        // dengan membuat local-copy dari contract ke JavaScript
+        // contractAddress sesuai dengan yang telah kita deploy. Ubah sesuai contract addressmu!
+        const contractAddress = '0xF60D84Bfa39D9A84c144F1Abad2546cC8079fe53';
+        // kita bisa mendapatkan interface di bawah ini dari ABI yang telah kita compile
+        const abiInterface = [{"constant":true,"inputs":[],"name":"getDonationBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastDonatedAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastDonatorAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"contractOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"donate","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
+        const donationBoxContract = new web3.eth.Contract(abiInterface, contractAddress);
+        
+        // seleksi dom #donation-balance dan isi sementara nilainya dengan teks node "loading..."
+        const balancePlaceholder = document.querySelector('#donation-balance');
+        balancePlaceholder.innerHTML = 'loading...';
+        // mencoba memanggil salah satu method yang ada di contract
+        donationBoxContract.methods.getDonationBalance().call().then(res => {
+          balancePlaceholder.innerHTML = res + ' ETH';
         });
       });
     </script>
